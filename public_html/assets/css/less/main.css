@@ -1,0 +1,11 @@
+/*
+Core Assets
+We use Twitter Bootstrap {@see twitter.github.com/bootstrap/}
+*/
+/* Import Functions/mixins */
+@import 'func.less';
+
+html, body {
+     // Ensure they have the same background color
+     background-color: whiteSmoke;
+}

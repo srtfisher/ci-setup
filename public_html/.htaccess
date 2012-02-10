@@ -1,0 +1,10 @@
+# TruantToday Codeigniter Rewrite
+# We want to rewrite it so that you don't have to have the 'index.php' in the URL
+# It looks better!
+#
+# Last Update: 8/24/2011 by srtfisher
+
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.php?$1 [L]
