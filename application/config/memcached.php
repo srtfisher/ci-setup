@@ -36,7 +36,7 @@
 */
 $config = array(
 	'default' => array(
-		'hostname' => 'truanttoday.1fhwcr.0001.use1.cache.amazonaws.com',
+		'hostname' => '',
 		'port'     => 11211,
 		'weight'   => 1,
 	),

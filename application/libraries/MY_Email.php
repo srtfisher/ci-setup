@@ -24,15 +24,12 @@ class MY_Email extends CI_Email {
 		
 		// Default from email
 		
-		// Start using our email class and override the default CI email system
-		// We're going to use SendGrid's servers
-		
 		/*
 		parent::initialize(array(
             'protocol' => 'smtp',
-            'smtp_host' => 'email-smtp.us-east-1.amazonaws.com',
-            'smtp_user' => 'AKIAI4MFA2LHH4LV6HZQ',
-            'smtp_pass' => 'Arbv68YnLEE4096+WiRIcyHeTWjf2DNJgVdlVHL21xKP',
+            'smtp_host' => '',
+            'smtp_user' => '',
+            'smtp_pass' => '',
             'smtp_port' => 465,
             'crlf' => "\r\n",
             'newline' => "\r\n"

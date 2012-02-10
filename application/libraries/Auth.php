@@ -828,97 +828,6 @@ class Auth
 	}
 	
 	/**
-	 * Model to hold the user registrations
-	 * It does all the processing here, no redirects.
-	 *
-	 * @param array $data The data argument
-	 * @return object|int A simple_error on error or an int which is the user ID
-	**/
-	public static function user_register( $data = array() )
-	{
-		$defaults = array(
-			'user_slug'		=>	'',
-			'user_email'	=>	'',
-			'user_pass'		=>	'',
-			'user_name'		=>	'',
-			'user_registration'	=>	'',
-			'user_suspended	'	=>	0,
-			'user_timezone'		=>	'UM8',
-		);
-		
-		//	We have a default set of values
-		$data = wp_parse_args($data, $defaults);
-		
-		// Something went wrong
-		if ( ! is_array( $data ) )
-			return simple_error('Internal error.');
-		
-		//	Validate the data
-		if (! valid_email($data['user_email']) OR empty($data['user_email']))
-			return simple_error("That email is invalid.");
-		
-		if ( empty($data['user_slug']))
-			return simple_error('That username is empty!');
-		
-		if (empty($data['user_pass']))
-			return simple_error('The password is empty!');
-		
-		//	We don't force a user's name
-		
-		//	Sanitize
-		$data['user_slug'] = sanitize_title_with_dashes($data['user_slug']);
-		$data['user_registration'] = current_datetime();
-		
-		//	Now checking if they are already taken!
-		$lookup_username = self::findUserbyLogin($data['user_slug']);
-		
-		if ($lookup_username !== FALSE)
-			return simple_error('That username is already taken.');
-		
-		//	Email registered?
-		$lookup_email = self::findUserbyEmail($data['user_email']);
-		
-		if ($lookup_email !== FALSE)
-			return simple_error("Someone is already registered with that email.");
-		
-		// Done. Let's get to it.
-		$hash = gen_hash();
-		
-		$sql = array();
-		$sql['user_pass'] = md5( $data['user_pass'] );
-		$sql['user_name'] = $data['user_name'];
-		$sql['user_slug'] = $data['user_slug'];
-		$sql['user_email'] = $data['user_email'];
-		
-		self::$CI->db->insert('users', $sql);
-		
-		//	UID
-		$UID = self::$CI->db->insert_id();
-		
-		// They have to be activated, so we're gonna store their registration in another table.
-		// When they are activated, we delete the row
-		self::$CI->db->set('time', current_datetime());
-		self::$CI->db->set('hash', md5($hash));		
-		self::$CI->db->set('user', $UID);
-		self::$CI->db->insert('acct_registrations');
-		
-		// Setting up the welcome email
-		// We're gonna use a nice HTML template, but we still need to support non-HTML email users!
-		$link = base_url() . 'users/activate/'.md5($hash);
-		
-		$content = "We just need to activate your account and you will be all set.  Click on the link below or copy and paste it into your browser.<br />";
-		$content .= "<br />";
-		$content .= "<a href='".$link."'><font color='black'>".$link."</font></a><br />";
-		
-		self::$CI->email->subject('Welcome to TruantToday!');
-		self::$CI->email->message($content);	
-		self::$CI->email->to($data['user_email'], $data['user_name']);
-		
-		self::$CI->email->send();
-		return TRUE;
-	}
-	
-	/**
 	 * A method to create a user's account and email them the details
 	 * Used to create a parent account and email them the password.
 	 *
@@ -1001,13 +910,11 @@ class Auth
 		
 		$link = site_url();
 		
-		$content = "We have created an account for you at TruantToday. You can login at the link below with the account details listed below. Enjoy!<br />";
+		$content = "We have created an account for you. You can login at the link below with the account details listed below. Enjoy!<br />";
 		$content .= "<br />";
 		$content .= "<a href='".$link."'><font color='black'>".$link."</font></a><br />Your login details will be:<br /><br />Username: ".$data['user_slug']."<br />Password: ".$password;
 		
-		//$content .= "<br><br>Regards,<br>TruantToday";
-		
-		self::$CI->email->subject('Welcome to TruantToday!');
+		self::$CI->email->subject('Welcome!');
 		self::$CI->email->message($content);	
 		self::$CI->email->to($data['user_email'], $data['user_first_name'] . ' ' .$data['user_last_name']);
 		
